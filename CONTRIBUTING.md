@@ -8,7 +8,7 @@
    current Palomar policy.
 4. Update `comparator.json` with every advertised theorem and any definition
    holes. Definition holes require special editorial scrutiny.
-5. Replace every `TEMPLATE` value in `formalization.yaml` with honest,
+5. Replace every `TEMPLATE` value in `formalization.yaml` with accurate,
    independently checkable metadata. Run
    `ruby scripts/validate-formalization.rb`; it parses the file and lists every
    retained sentinel, including deliberately invalid classification, proof,

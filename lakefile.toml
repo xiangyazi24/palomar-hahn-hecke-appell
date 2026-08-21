@@ -1,14 +1,17 @@
-name = "PalomarTemplate"
+name = "palomar_hahn_hecke_appell"
 version = "0.1.0"
-defaultTargets = ["PalomarTemplate", "Challenge", "Solution"]
+defaultTargets = ["PalomarHahnHeckeAppell", "QseriesFormalization", "Challenge", "Solution"]
 
 [[require]]
 name = "mathlib"
 git = "https://github.com/leanprover-community/mathlib4.git"
-rev = "v4.32.0"
+rev = "v4.30.0"
 
 [[lean_lib]]
-name = "PalomarTemplate"
+name = "PalomarHahnHeckeAppell"
+
+[[lean_lib]]
+name = "QseriesFormalization"
 
 [[lean_lib]]
 name = "Challenge"
@@ -17,4 +20,3 @@ roots = ["Challenge"]
 [[lean_lib]]
 name = "Solution"
 roots = ["Solution"]
-
