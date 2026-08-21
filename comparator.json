@@ -1,7 +1,9 @@
 {
   "challenge_module": "Challenge",
   "solution_module": "Solution",
-  "theorem_names": ["PalomarHahnHeckeAppell.row_exponent_identity"],
+  "theorem_names": [
+    "PalomarHahnHeckeAppell.general_boundary_cleared_coefficient"
+  ],
   "definition_names": [],
   "permitted_axioms": ["propext", "Quot.sound", "Classical.choice"],
   "enable_nanoda": true

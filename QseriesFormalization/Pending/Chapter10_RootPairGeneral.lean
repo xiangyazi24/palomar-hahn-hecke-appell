@@ -1,10 +1,10 @@
-import QseriesFormalization.Basic
+import Mathlib
 
 /-!
 # General Root-Pair Row-Coefficient Theorem
 
 Formalization of the general row-coefficient theorem from
-`paper/root-pair-involution/root_pair_note.tex` for all coprime (n, p).
+`paper/root-pair-involution/root_pair_note.tex` for arbitrary positive `(n,p)`.
 
 The main identity:  barJ · f_{n,n+p,n} = barJ · g_{n,n+p,n} + barTheta_{n,p}
 -/

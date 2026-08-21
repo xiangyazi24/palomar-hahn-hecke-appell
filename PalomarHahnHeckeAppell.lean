@@ -1,5 +1,4 @@
-import QseriesFormalization.Pending.Chapter10_M3_AppellCoeffNF
-import QseriesFormalization.Pending.Chapter10_RootPairGeneral
+import QseriesFormalization.Pending.Chapter10_GeneralHahnCoeff
 
 /-!
 # Hahn-series Hecke--Appell formalization

@@ -2,12 +2,12 @@
 version: "v0.4"
 
 project:
-  name: "Hahn-series coefficientwise Hecke--Appell identities"
+  name: "General Hahn-series coefficientwise Hecke--Appell identities"
   description: >-
-    A Lean 4 formalization of the f_{2,3,2} special case of the
-    Hickerson--Mortenson Hecke--Appell identity and of the general algebraic
-    mechanism used in a new Hahn-series coefficientwise proof: the row-exponent
-    collapse, branch-sign equivalences, parity transport, and wall involution.
+    A Lean 4 verification of the boundary-cleared coefficient identity for
+    f_{n,n+p,n}, for all positive integers n and p. The audited statement
+    equates each Hecke coefficient with two explicit finite families of
+    cleared Appell residue rows plus the wall correction coefficient.
   authors:
     - "Xiang Huang"
   license: "Apache-2.0"
@@ -25,9 +25,8 @@ sources:
     type: paper
     relationship: formalizes
     note: >-
-      The Lean development formalizes the f_{2,3,2} specialization and the
-      general row-exponent and branch-sign algebra, not the paper's full
-      general-(n,p) assembly.
+      The selected theorem formalizes the paper's general positive-(n,p)
+      boundary-cleared identity in its intended coefficientwise form.
   - title: "Hecke-type double sums, Appell--Lerch sums, and mock theta functions, I"
     authors:
       - "Dean Hickerson"
@@ -37,18 +36,19 @@ sources:
     location: "https://doi.org/10.1112/plms/pdu007"
     relationship: independently-proves
     note: >-
-      The present Hahn-series proof independently proves a specialization of
-      the published Hecke--Appell identity by a coefficientwise algebraic route.
+      The present proof gives a new signed Hahn-branch coefficient argument
+      for the general boundary-cleared Hecke--Appell family.
 
 related_formalizations: []
 
 status:
   scope: >-
-    The substantive development proves the f_{2,3,2} Hecke--Appell identity and
-    the general row-exponent, branch-sign, parity, and wall-involution lemmas.
-    The Kronecker comparison and full general-(n,p) assembly in the paper are
-    not formalized. The current preliminary Comparator configuration advertises
-    only the general row-exponent identity and is not submission-ready.
+    Comparator checks the explicit general coefficient identity for every
+    positive n,p. The proof includes the signed Hahn inverse recurrence,
+    denominator branch sign, row-exponent collapse, monomial forcing of both
+    finite residue families, local finiteness, and wall-term assembly. The
+    separate analytic Kronecker comparison with the printed
+    Hickerson--Mortenson theta quotient is not part of this entry.
   sorry_count: 0
   sorry_in_definitions: 0
   axioms: [propext, Classical.choice, Quot.sound]
@@ -60,15 +60,14 @@ automation:
       framework: "Lean 4 with remote build and multi-model review"
       tool_setup: >-
         AI-assisted proof development, source comparison, dependency auditing,
-        clean-checkout builds, and axiom inspection under human direction.
+        clean builds, and axiom inspection under human direction.
       cost:
         wall_time: "not reconstructed"
         spend_usd: "subscription-based"
         hardware: "Mac mini orchestration and uisai2 Linux verification"
       prompting_notes: >-
-        Agents proposed and reviewed proof steps; every retained declaration was
-        checked by Lean, and the advertised theorem chain was rebuilt from a
-        clean source snapshot.
+        Agents proposed and reviewed proof steps; every retained declaration
+        was checked by Lean and the advertised theorem was axiom-audited.
   spend_usd: "subscription-based"
   notes: >-
     The final submission record will retain only claims supported by the pinned
@@ -76,10 +75,11 @@ automation:
 
 fidelity:
   divergences: >-
-    The paper proves the Hickerson--Mortenson family for general positive n and
-    p. Lean currently verifies the f_{2,3,2} specialization and the general
-    algebraic mechanism, but not the Kronecker comparison or full general
-    assembly. The preliminary Challenge exposes only the row-exponent identity.
+    The theorem is stated coefficientwise because the wall correction need not
+    be an element of the selected q-first Hahn ring for n at least 2. The
+    independent analytic Kronecker comparison identifying this wall
+    coefficient with the printed Hickerson--Mortenson theta quotient remains
+    outside the selected statement.
 
 review:
   status: "agent-reviewed"
@@ -87,26 +87,22 @@ review:
     - "Claude"
     - "OpenAI Codex"
   notes: >-
-    The paper and Lean scope were compared explicitly. The target modules were
-    rebuilt from a clean checkout, and the principal declarations were checked
-    to use only propext, Classical.choice, and Quot.sound.
+    The paper and Lean definitions were compared claim by claim. The target
+    modules were rebuilt on uisai2 and the selected declaration was checked to
+    use only propext, Classical.choice, and Quot.sound.
 
 alignment:
   namespace: "PalomarHahnHeckeAppell"
   statements:
-    - source: "Proposition 2.6 (row-exponent identity)"
-      lean: "PalomarHahnHeckeAppell.row_exponent_identity"
+    - source: "General boundary-cleared Hecke--Appell coefficient identity"
+      lean: "PalomarHahnHeckeAppell.general_boundary_cleared_coefficient"
       module: "Challenge"
       status: proved
-      note: "The preliminary Comparator target matches the paper's integral row-exponent identity."
-    - source: "The f_{2,3,2} Hecke--Appell specialization"
-      lean: "QseriesFormalization.Pending.Ch10M3Ghat.Fhm_eq_Ghat_via_uvOmega"
-      module: "QseriesFormalization.Pending.Chapter10_M3_AppellCoeffNF"
-      status: proved
       note: >-
-        Present in the substantive development but not yet exposed by the
-        preliminary Challenge/Comparator pair.
+        For every positive n,p and every q,x,y exponent triple, this equates
+        the explicit Hecke coefficient with the two finite cleared Appell
+        residue-row coefficients plus the wall correction coefficient.
 
 acknowledgements: >-
-  Mathlib and Lean provide the formal foundation. The mathematical identity is
-  due to Dean Hickerson and Eric Mortenson.
+  Mathlib and Lean provide the formal foundation. The original identity is due
+  to Dean Hickerson and Eric Mortenson.
