@@ -2,7 +2,8 @@
   "challenge_module": "Challenge",
   "solution_module": "Solution",
   "theorem_names": [
-    "PalomarHahnHeckeAppell.general_boundary_cleared_coefficient"
+    "PalomarHahnHeckeAppell.kronecker_partial_fraction_cleared_coefficient",
+    "PalomarHahnHeckeAppell.general_boundary_cleared_hm_coefficient"
   ],
   "definition_names": [],
   "permitted_axioms": ["propext", "Quot.sound", "Classical.choice"],

@@ -1,0 +1,13 @@
+import QseriesFormalization.Pending.Chapter10_HahnHeckeAppell
+
+open QseriesFormalization.Pending.Ch10KroneckerCoeff
+open QseriesFormalization.Pending.Ch10HMComparison
+open QseriesFormalization.Pending.Ch10HahnHeckeAppell
+
+#print axioms kronecker_partial_fraction_coefficientwise
+#print axioms QseriesFormalization.Pending.Ch10RootPairGeneral.heckeExp_scale
+#print axioms hmExpandedCoefficient_eq_hmThetaCoefficient
+#print axioms hmThetaCoefficient_eq_thetaCoefficient
+#print axioms hmExpandedCoefficient_eq_thetaCoefficient
+#print axioms general_boundary_cleared_hm_coefficient
+#print axioms hahn_hecke_appell_full_certificate

@@ -2,12 +2,11 @@
 version: "v0.4"
 
 project:
-  name: "General Hahn-series coefficientwise Hecke--Appell identities"
+  name: "A Hahn-series coefficientwise proof of the Hickerson--Mortenson Hecke--Appell identities"
   description: >-
-    A Lean 4 verification of the boundary-cleared coefficient identity for
-    f_{n,n+p,n}, for all positive integers n and p. The audited statement
-    equates each Hecke coefficient with two explicit finite families of
-    cleared Appell residue rows plus the wall correction coefficient.
+    A Lean 4 verification of the coefficientwise Kronecker partial-fraction
+    identity and the general boundary-cleared Hickerson--Mortenson
+    Hecke--Appell identity for f_{n,n+p,n}, for all positive integers n and p.
   authors:
     - "Xiang Huang"
   license: "Apache-2.0"
@@ -43,12 +42,13 @@ related_formalizations: []
 
 status:
   scope: >-
-    Comparator checks the explicit general coefficient identity for every
-    positive n,p. The proof includes the signed Hahn inverse recurrence,
-    denominator branch sign, row-exponent collapse, monomial forcing of both
-    finite residue families, local finiteness, and wall-term assembly. The
-    separate analytic Kronecker comparison with the printed
-    Hickerson--Mortenson theta quotient is not part of this entry.
+    Comparator checks two declarations: the cleared coefficientwise
+    Kronecker identity used in Appendix A, and the explicit general
+    Hickerson--Mortenson coefficient identity for every positive n,p. The
+    proof includes signed Hahn inverse coefficients, coefficient-local
+    finiteness, row-exponent collapse, both finite residue families, the
+    five-index expansion of the printed correction, and its identification
+    with the wall term.
   sorry_count: 0
   sorry_in_definitions: 0
   axioms: [propext, Classical.choice, Quot.sound]
@@ -75,33 +75,47 @@ automation:
 
 fidelity:
   divergences: >-
-    The theorem is stated coefficientwise because the wall correction need not
-    be an element of the selected q-first Hahn ring for n at least 2. The
-    independent analytic Kronecker comparison identifying this wall
-    coefficient with the printed Hickerson--Mortenson theta quotient remains
-    outside the selected statement.
+    The formal statement records equality of every q,x,y coefficient after
+    clearing the common Jacobi factor. It proves local finiteness at each
+    coefficient but does not assert a global well-ordered-support theorem or a
+    series-valued Hahn wrapper for the assembled families. The registered
+    coefficient functions are rational-valued; the paper's integer-valued
+    interpretation, integrality, and arbitrary-ring base change are not
+    separate registered Lean theorems.
 
 review:
   status: "agent-reviewed"
   reviewers:
-    - "Claude"
     - "OpenAI Codex"
+    - "OpenAI GPT-5.6 Sol (independent max-effort audit)"
   notes: >-
-    The paper and Lean definitions were compared claim by claim. The target
-    modules were rebuilt on uisai2 and the selected declaration was checked to
-    use only propext, Classical.choice, and Quot.sound.
+    The paper and Lean definitions were compared claim by claim. The extracted
+    proof closure was rebuilt on uisai2 and both selected declarations were
+    checked to use only Palomar-permitted axioms. The independent audit found
+    no mismatch in the quantified parameters, residue ranges, signs, parity,
+    exponents, or five-index Hickerson--Mortenson comparison; its scope
+    correction about global Hahn support is incorporated here.
 
 alignment:
   namespace: "PalomarHahnHeckeAppell"
   statements:
-    - source: "General boundary-cleared Hecke--Appell coefficient identity"
-      lean: "PalomarHahnHeckeAppell.general_boundary_cleared_coefficient"
+    - source: "Appendix A, cleared coefficientwise Kronecker partial-fraction identity"
+      lean: "PalomarHahnHeckeAppell.kronecker_partial_fraction_cleared_coefficient"
+      module: "Challenge"
+      status: proved
+      note: >-
+        Identifies every coefficient of the Jacobi-cleared bilateral
+        Kronecker sum with the corresponding shifted partial-fraction
+        coefficient.
+    - source: "General boundary-cleared Hickerson--Mortenson coefficient identity"
+      lean: "PalomarHahnHeckeAppell.general_boundary_cleared_hm_coefficient"
       module: "Challenge"
       status: proved
       note: >-
         For every positive n,p and every q,x,y exponent triple, this equates
         the explicit Hecke coefficient with the two finite cleared Appell
-        residue-row coefficients plus the wall correction coefficient.
+        residue-row coefficients plus the five-index expansion of the printed
+        Hickerson--Mortenson correction.
 
 acknowledgements: >-
   Mathlib and Lean provide the formal foundation. The original identity is due

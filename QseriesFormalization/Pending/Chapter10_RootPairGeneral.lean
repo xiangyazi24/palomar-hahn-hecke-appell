@@ -65,6 +65,16 @@ theorem two_mul_heckeExp (n p r s : ℤ) :
   simp only [heckeExp, heckeExpTwice]
   linear_combination n * two_mul_C2 r + n * two_mul_C2 s
 
+/--
+The exponent identity behind the non-coprime scaling
+`f_{d*n,d*(n+p),d*n}(x,y;q) = f_{n,n+p,n}(x,y;q^d)`.
+It holds without positivity or coprimality assumptions.
+-/
+theorem heckeExp_scale (d n p r s : ℤ) :
+    heckeExp (d * n) (d * p) r s = d * heckeExp n p r s := by
+  simp only [heckeExp]
+  ring
+
 /-! ## 3. Wall parameter pL -/
 
 def pL (a b n p : ℤ) : ℤ := 4 * a * n - 2 * a * p - 4 * a + 4 * b + 2 * n - p
@@ -245,9 +255,10 @@ theorem C2Twice_add (k ell : ℤ) :
     C2Twice (k + ell) = C2Twice k + C2Twice ell + 2 * k * ell := by
   simp only [C2Twice]; ring
 
-/-! ## 10. Kronecker partial fraction — placeholder -/
+/-! ## 10. Appendix dependency -/
 
--- Kronecker partial fraction (Lemma A.1 in the paper) is not formalized here;
--- it is a classical identity proved by residue/principal-part analysis.
+-- The coefficientwise Kronecker proof is kept in the independent downstream
+-- module `Chapter10_KroneckerCoeff`; the present file remains the minimal
+-- algebraic dependency of the two general Appell-row proofs.
 
 end QseriesFormalization.Pending.Ch10RootPairGeneral

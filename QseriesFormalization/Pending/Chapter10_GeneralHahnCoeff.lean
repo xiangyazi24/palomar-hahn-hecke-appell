@@ -5,9 +5,9 @@ import Mathlib
 # General coefficient kernel for the Hahn-series Hecke--Appell proof
 
 This file formalizes the coefficientwise route for arbitrary positive `n,p`.
-The theta correction is intentionally represented by its coefficient function:
-for `n ≥ 2` it need not be an element of the q-first Hahn ring, although every
-fixed coefficient is a finite sum.
+The theta correction is intentionally represented by its coefficient function.
+The development proves local finiteness for every fixed coefficient; it does
+not assert a global well-ordered-support theorem for the assembled family.
 -/
 
 namespace QseriesFormalization.Pending.Ch10GeneralHahnCoeff
@@ -631,8 +631,8 @@ The general boundary-cleared Hecke--Appell identity, coefficient by coefficient.
 
 The two raw Appell coefficients are those obtained after expanding the signed
 Hahn geometric inverse and solving the `x,y` monomial constraints. The wall
-correction is a coefficient function rather than a Hahn-series value because
-it can contain arbitrarily placed negative q-powers.
+correction is kept as a coefficient function because the global Hahn-support
+wrapper is outside the scope of this theorem.
 -/
 theorem general_boundary_cleared_coefficient
     (n p e r s : ℤ) (hn : 0 < n) (hp : 0 < p) :
@@ -683,4 +683,3 @@ theorem general_boundary_cleared_residue_coefficient
 end
 
 end QseriesFormalization.Pending.Ch10GeneralHahnCoeff
-

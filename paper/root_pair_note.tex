@@ -1,0 +1,824 @@
+\documentclass[11pt]{article}
+
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage[margin=1in]{geometry}
+\usepackage{xurl}
+\usepackage{hyperref}
+\hypersetup{
+  pdftitle={A Hahn-Series Coefficientwise Proof of the Hickerson--Mortenson Hecke--Appell Identities},
+  pdfauthor={Xiang Huang}
+}
+
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{remark}[theorem]{Remark}
+\newtheorem{definition}[theorem]{Definition}
+
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\Q}{\mathbb{Q}}
+\newcommand{\sg}{\operatorname{sg}}
+\newcommand{\sgtwo}{\operatorname{sg}_2}
+
+\title{A Hahn-Series Coefficientwise Proof of the\\
+Hickerson--Mortenson Hecke--Appell Identities}
+\author{Xiang Huang}
+\date{August 2026}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+We give a coefficientwise proof guided by an ordered Hahn-series expansion
+of the Hickerson--Mortenson identity expressing the Hecke-type
+double sum $f_{n,n+p,n}$ as an Appell--Lerch sum plus a theta
+correction, for all $n,p\ge 1$.  The decomposition itself is derived without convergence estimates or
+Ramanujan's ${}_1\psi_1$ summation, using a single algebraic
+mechanism: the Hahn order assigns each Appell--Lerch denominator
+$1/(1-M)$ a branch sign $\sg(\gamma)$ determined by
+the monomial order, and the resulting coefficient-level sign-wall kernel $\sgtwo$
+is the theta correction---not an ad hoc residue, but the forced
+cost of the chosen expansion chamber.  A row-exponent ring
+identity collapses the multi-index Appell exponent to the Hecke
+quadratic $H(r,s)$ plus a pure theta shell $N\binom{w+1}{2}$.
+The remaining wall term is identified with the
+Hickerson--Mortenson theta correction $\theta_{n,p}$ via a
+coefficientwise Hahn proof of the Kronecker partial-fraction identity.
+At the paper level, the identity is a family of $\Z$-coefficient
+identities, one per monomial.  The Lean statements realize these
+coefficient kernels over $\Q$; integrality and general-ring base change are
+not separate formalized theorems.  The general coefficient theorem, the
+source-faithful comparison with HM's printed correction, and the
+coefficientwise Kronecker argument have been verified in Lean~4 with zero
+\texttt{sorry}
+and no axioms beyond \texttt{propext},
+\texttt{Classical.choice}, and \texttt{Quot.sound}.
+\end{abstract}
+
+%----------------------------------------------------------------------
+\section{Introduction}
+%----------------------------------------------------------------------
+
+\subsection*{Motivation: bilateral algebra needs an order}
+
+Naive bilateral formal manipulation is inconsistent.
+In a Laurent ring, the geometric identity
+$(1-z)\sum_{k\ge 0}z^k=1$ is unambiguous, but a bilateral
+``identity'' $(1-z)\sum_{k\in\Z}z^k=0$ would yield $1=0$ by
+dividing.  The root cause is that $\sum_{k\in\Z}z^k$ has no
+well-ordered support.  In a Hahn-series ring with a
+lexicographic monomial order, the inverse $(1-M)^{-1}$ is
+uniquely defined: it expands as $\sum_{\ell\ge 0}M^\ell$
+or $-\sum_{\ell\ge 1}M^{-\ell}$, depending on the sign of the
+leading exponent of~$M$.  The branch choice is forced, and
+the branch sign is the price the algebra pays for
+well-definedness.
+
+This paper shows that the Hickerson--Mortenson theta correction
+in a Hecke-type identity is exactly that price: the sign-wall
+kernel $\sgtwo$ produced by expanding Appell--Lerch denominators
+in the Hahn ring.
+
+\subsection*{Background}
+
+Hickerson and Mortenson~\cite{jHiMo14} proved that every Hecke-type
+double sum $f_{n,n+p,n}$ (stated under $\gcd(n,p)=1$) decomposes as an
+Appell--Lerch sum $g_{n,n+p,n}$ plus a theta correction
+$\theta_{n,p}/\bar{J}_{0,N}$, where $N=np(2n+p)$.  Their proof uses
+analytic functional equations and a growth-based uniqueness argument.
+Mortenson~\cite{jMo12} gave an alternative proof using Ramanujan's
+${}_1\psi_1$ summation.  Both proofs rely on convergence in the region
+$|q|<1$ and produce the theta correction as an analytic residue.
+For background on mock theta functions and
+Appell--Lerch sums, see Zwegers~\cite{oZw02} and Chan~\cite{oCh11};
+for Bailey-pair approaches to Hecke-type double sums producing
+one-variable specializations, see Andrews~\cite{jAn01} and
+Lovejoy--Osburn~\cite{jLO13}.
+
+\subsection*{This paper}
+
+We give a Hahn-series coefficientwise proof of the decomposition
+that replaces the analytic ingredients by formal algebra.  The key observation
+is that the Hahn order assigns each Appell--Lerch denominator
+$1/(1-M)$ a branch sign $\sg(\gamma)$ determined by the
+monomial order.  After clearing the $\bar{J}$-factor and expanding all
+Appell rows, the resulting coefficient is a sign-wall function
+$\sgtwo$ that differs from the Hecke cone indicator by exactly
+the theta correction $\bar\Theta_{n,p}$.
+
+The proof reduces to two ingredients:
+\begin{enumerate}
+\item A \emph{row-exponent ring identity} (Proposition~\ref{prop:exponent})
+  showing that the Appell row exponent simplifies to $H(r,s)+N\binom{w+1}{2}$.
+\item The \emph{signed Hahn geometric inverse} (Lemma~\ref{lem:hahn})
+  producing the branch coefficient $(\sg(s)-\sg(V_w))/2$ per row.
+\end{enumerate}
+The displayed kernels are integer-valued, so the paper argument gives
+$\Z$-identities one coefficient at a time.  The Lean theorem is stated over
+$\Q$ and does not separately package integrality or base change to an
+arbitrary commutative ring.  The coefficient data is nevertheless available
+as input to radial-limit and quantum-modular analysis~\cite{jZag10,jFOR13},
+where $|q|<1$ proofs do not apply directly.
+
+Table~\ref{tab:replacement} summarizes how each analytic ingredient
+is replaced.
+
+\begin{table}[ht]
+\centering
+\begin{tabular}{ll}
+\hline
+\textbf{Analytic ingredient} & \textbf{Hahn-series replacement} \\
+\hline
+Convergence ($|q|<|x|<1$) & Lexicographic monomial order \\
+Geometric expansion branch & Signed Hahn inverse (Lemma~\ref{lem:hahn}) \\
+Analytic continuation & Coefficientwise identity \\
+Poles, residues, uniqueness & Coefficientwise kernel identity \\
+Theta correction formula & Sign-wall boundary term ($\sgtwo$) \\
+${}_1\psi_1$ summation & Not used (Appendix uses Kronecker PF) \\
+\hline
+\end{tabular}
+\caption{Analytic ingredients and their formal replacements.}
+\label{tab:replacement}
+\end{table}
+
+\medskip
+\noindent\textbf{Scope.}
+The coefficientwise proof of the sign-wall identity is
+contained in Sections~\ref{sec:defs}--\ref{sec:proof}.
+The analytic specialization (recovering HM's analytic identity)
+requires matching the Hahn branch with the convergent branch
+on the unit torus (Remark~\ref{rem:analytic}), plus analytic
+continuation in $x,y$.
+The identification with HM's printed theta correction is proved
+separately in Appendix~\ref{app:HM-coeff-comparison}.  Its Kronecker step is
+proved coefficientwise from the signed Hahn inverse and a reflected boundary
+cancellation.  The Lean~4 development verifies this appendix and the full
+general-$(n,p)$ coefficient assembly; the earlier $f_{2,3,2}$ proof remains
+as an independent regression instance in HM's spiral parametrization.
+
+\medskip
+\noindent\textbf{Outline.}
+Section~\ref{sec:defs} gives the definitions and sign conventions.
+Section~\ref{sec:hahn} proves the Hahn inverse lemma.
+Section~\ref{sec:rows} proves the row-coefficient propositions.
+Section~\ref{sec:proof} proves the main theorem.
+Section~\ref{sec:examples} gives three examples.
+Section~\ref{sec:lean} describes the Lean~4 formalization.
+
+%----------------------------------------------------------------------
+\section{Definitions}\label{sec:defs}
+%----------------------------------------------------------------------
+
+We use the Jacobi theta function
+$j(z;q)=\sum_{k\in\Z}(-1)^k q^{\binom{k}{2}}z^k$,
+the Appell--Lerch sum
+$m(x,q,z)=\frac{1}{j(z;q)}\sum_{k\in\Z}
+\frac{(-1)^k q^{\binom{k}{2}}z^k}{1-q^{k-1}xz}$,
+the notation $\bar{J}_{0,N}=j(-1;\,q^N)$, and the Euler product
+$J_m=\prod_{i\ge 1}(1-q^{mi})$.
+
+\begin{definition}[Hecke-type double sum]
+\[
+  f_{A,B,C}(x,y;q)
+  =\Bigl(\sum_{r,s\ge 0}-\sum_{r,s<0}\Bigr)
+    (-1)^{r+s}x^r y^s\,
+    q^{A\binom{r}{2}+Brs+C\binom{s}{2}}.
+\]
+For $f_{n,n+p,n}$: set $B=n+p$,
+$\Delta=p(2n+p)$, $N=n\Delta$, and
+\[
+  H(r,s)=n\tbinom{r}{2}+(n+p)rs+n\tbinom{s}{2}.
+\]
+Define the sign-wall functions
+$\sg(u)=1$ if $u\ge 0$, $\sg(u)=-1$ if $u<0$, and
+$\sgtwo(u,v)=(\sg(u)+\sg(v))/2$.  Thus $\sgtwo$ takes values
+in $\{-1,0,1\}$: it equals $1$ when both arguments are
+nonnegative, $-1$ when both are negative, and $0$ when they
+disagree in sign.
+
+\medskip
+\begin{center}
+\begin{tabular}{c|cc}
+$u\backslash v$ & $v\ge 0$ & $v<0$ \\
+\hline
+$u\ge 0$ & $\sgtwo=1$ & $\sgtwo=0$ \\
+$u<0$ & $\sgtwo=0$ & $\sgtwo=-1$
+\end{tabular}
+\end{center}
+\end{definition}
+
+\begin{definition}[Appell--Lerch row decomposition]
+Set $A_0=\frac{np(2n+p+1)}{2}$.
+For $t=0,\ldots,n-1$, define the $s$-split rows
+\[
+G_t^{(s)}=(-y)^t\,q^{n\binom{t}{2}}\,
+  j(q^{Bt}x;\,q^n)\cdot
+  m\!\Bigl(-q^{A_0-t\Delta}\frac{(-y)^n}{(-x)^B},\;q^N,\;-1\Bigr),
+\]
+and the $r$-split rows
+\[
+G_t^{(r)}=(-x)^t\,q^{n\binom{t}{2}}\,
+  j(q^{Bt}y;\,q^n)\cdot
+  m\!\Bigl(-q^{A_0-t\Delta}\frac{(-x)^n}{(-y)^B},\;q^N,\;-1\Bigr).
+\]  Define
+$g_{n,n+p,n}=\sum_{t=0}^{n-1}(G_t^{(s)}+G_t^{(r)})$.
+
+These parameters match \cite{jHiMo14}, Theorem~0.3,
+specialized to $(z_0,z_1)=(-1,-1)$.
+\end{definition}
+
+\begin{definition}[Bar-$J$-cleared theta correction]
+\[
+  \bar\Theta_{n,p}=\sum_{r,s,w\in\Z}
+    (-x)^r(-y)^s\,
+    \sgtwo\!\Bigl(r+nw+\tfrac{n-1}{2},\;
+                   s-nw-\tfrac{n+1}{2}\Bigr)\,
+    q^{H(r,s)+N\binom{w+1}{2}}.
+\]
+\end{definition}
+
+\begin{proposition}[Identification with HM]\label{prop:HM}
+With the conventions above, $\bar\Theta_{n,p}$ and
+$\theta_{n,p}^{\mathrm{HM}}$ have the same coefficient function for all
+$n,p\ge 1$.  Here $\theta_{n,p}^{\mathrm{HM}}$ is the theta correction
+in~\cite{jHiMo14}, Theorem~0.3 (stated there under
+$\gcd(n,p)=1$), specialized to $(z_0,z_1)=(-1,-1)$,
+taking HM's printed formula as the definition of
+$\theta_{n,p}^{\mathrm{HM}}$ in the non-coprime case.
+\end{proposition}
+
+\begin{proof}
+Appendix~\ref{app:HM-coeff-comparison} gives the direct
+coefficient comparison.  It uses the coefficientwise Kronecker
+partial-fraction identity (Lemma~\ref{lem:kronecker}) to
+expand the HM finite theta quotient, then reindexes from the
+residue pair $(r^*,s^*)$ to the integer triple $(R,S,w)$.
+The exponent collapses to $H(R,S)+N\binom{w+1}{2}$,
+and the branch signs produce $\sgtwo(U_w,V_w)$.
+
+\emph{Note:} This identification is logically independent of
+the main proof (Theorem~\ref{thm:main}).  It serves to match
+$\bar\Theta_{n,p}$ against HM's printed formula; the
+Hecke--Appell decomposition itself (Theorem~\ref{thm:main})
+is proved without it.
+\end{proof}
+
+\begin{remark}[Consistency check]
+As a consistency check (using HM's theorem, not part of our
+independent proof), compare coefficients in the cleared HM identity
+$\bar{J}\cdot f=\bar{J}\cdot g+\theta_{n,p}^{\mathrm{HM}}$
+and Theorem~\ref{thm:main}.  Subtracting shows that
+$\bar\Theta_{n,p}$ and $\theta_{n,p}^{\mathrm{HM}}$ have the same
+coefficient function.
+The self-contained proof of this identification is in
+Appendix~\ref{app:HM-coeff-comparison}.
+\end{remark}
+
+We record the HM theta correction for completeness.  With
+$r=r^*+\{(n-1)/2\}$, $s=s^*+\{(n-1)/2\}$:
+\begin{align*}
+\theta_{n,p}^{\mathrm{HM}}&=\sum_{r^*=0}^{p-1}\sum_{s^*=0}^{p-1}
+ q^{n\binom{r-(n-1)/2}{2}+B(r-(n-1)/2)(s+(n+1)/2)+n\binom{s+(n+1)/2}{2}}\\
+&\quad\times(-x)^{r-(n-1)/2}(-y)^{s+(n+1)/2}\\
+&\quad\times
+\frac{J_{p^2(2n+p)}^3\,
+  j(-q^{np(s-r)}x^n/y^n;\,q^{np^2})\,
+  j(q^{p(2n+p)(r+s)+p(n+p)}x^py^p;\,q^{p^2(2n+p)})}
+  {j(q^{p(2n+p)r+p(n+p)/2}(-y)^B/(-x)^n,\,
+     q^{p(2n+p)s+p(n+p)/2}(-x)^B/(-y)^n;\,q^{p^2(2n+p)})}.
+\end{align*}
+Here $j(a,b;Q):=j(a;Q)\,j(b;Q)$.
+
+\begin{theorem}[Main coefficient identity]\label{thm:main}
+Let $n,p\ge 1$.  For every $(e,r,s)\in\Z^3$,
+\[
+  [q^e x^r y^s]\bigl(\bar{J}_{0,N}\cdot f_{n,n+p,n}\bigr)
+  =
+  [q^e x^r y^s]\bigl(\bar{J}_{0,N}\cdot g_{n,n+p,n}
+    +\bar\Theta_{n,p}\bigr).
+\]
+\end{theorem}
+
+\begin{remark}
+Neither Theorem~\ref{thm:main} nor
+Proposition~\ref{prop:HM} requires $\gcd(n,p)=1$: the proof
+uses only the division algorithm $s=n\ell+t$ (valid for all
+$n\ge 1$), polynomial exponent algebra, and the
+Kronecker partial-fraction identity, none of which involve
+coprimality.  Hickerson--Mortenson~\cite{jHiMo14} state their
+Theorem~0.3 under $\gcd(n,p)=1$; our results extend the identity
+to all $n,p\ge 1$ by taking HM's printed formula as the
+definition of $\theta_{n,p}^{\mathrm{HM}}$ in the non-coprime
+case.
+\end{remark}
+
+%----------------------------------------------------------------------
+\section{The Signed Hahn Geometric Inverse}\label{sec:hahn}
+%----------------------------------------------------------------------
+
+\subsection{Coefficient ring}
+We work in the Hahn-series ring~\cite{oHa07}
+$S=\mathrm{HahnSeries}\,(\Gamma,\Q)$
+where $\Gamma=\Z^3$ with the lexicographic order $(e,a,b)$, so that
+$q=\mathfrak{q}^{(1,0,0)}$, $x=\mathfrak{q}^{(0,1,0)}$,
+$y=\mathfrak{q}^{(0,0,1)}$.  A monomial $q^e x^a y^b$ has leading
+exponent $(e,a,b)$, and the sign $\sg(\gamma)$ refers to the
+lexicographic sign of $\gamma$.  In particular, for the Appell
+denominator monomial $M_{k,t}=q^D\cdot(-y)^n/(-x)^B$, the leading
+exponent is $(D,-B,n)$, which is positive iff $D>0$
+(since $D$ is the first component).
+
+All identities below are interpreted coefficientwise: for each
+fixed $(e,r,s)$, the coefficient $[q^e x^r y^s]$ of every displayed
+series is a finite sum.  The Hahn order is used only to define
+the branch of each geometric inverse (Lemma~\ref{lem:hahn}).
+Lemma~\ref{lem:finite} below ensures that the theta-shell sums
+are locally finite.  More precisely, for each displayed bilateral
+sum $\sum_k q^{N\binom{k}{2}}/(1-M_{k,t})$, the monomial
+forcing (Step~1 in Proposition~\ref{prop:s-row}) pins
+$(t,\ell,u)$ from $(r,s)$, and $e$ determines $k$ to at most
+two values, so only finitely many terms contribute to each
+coefficient.
+
+
+\begin{remark}[Coefficientwise reading]\label{rem:coeff}
+Theorem~\ref{thm:main} is an identity of coefficient functions: for each
+fixed $(e,r,s)\in\Z^3$, both displayed coefficients are finite sums and
+agree.  The Hahn order determines the branch of each individual geometric
+inverse (Lemma~\ref{lem:hahn}); Lemma~\ref{lem:finite} and
+Proposition~\ref{prop:s-row} establish the local finiteness needed for the
+coefficient calculation.  We do not infer global well-ordered support from
+this local statement, and this paper does not supply a Hahn-series wrapper
+for the assembled three-variable families.  In particular, the occurrence
+of negative $q$-powers by itself would not decide Hahn-series membership.
+\end{remark}
+
+\begin{remark}[Analytic specialization]\label{rem:analytic}
+The formal identity specializes to HM's analytic identity
+in any chamber where $|M_{k,t}|<1$ iff $\gamma_{k,t}>0$.
+Since the denominator monomial $M_{k,t}$ has leading $q$-exponent
+$\gamma_{k,t}$ and auxiliary-variable factor $(-y)^n/(-x)^B$,
+this condition holds on the unit torus $|x|=|y|=1$
+(avoiding Appell poles): there $|M_{k,t}|=|q|^{\gamma_{k,t}}$,
+so the Hahn branch coincides with the convergent branch and
+the identity specializes by absolute convergence.  For
+generic $|x|,|y|\neq 1$, the leading $q$-exponent may not
+dominate $|M_{k,t}|$, and analytic continuation in $x,y$
+is required to recover HM's identity over all of
+$\{|q|<1\}\times(\mathbb{C}^*)^2$.
+\end{remark}
+
+\begin{lemma}[Hahn geometric inverse]\label{lem:hahn}
+Let $\Gamma$ be a linearly ordered abelian group and let
+$S=\mathrm{HahnSeries}(\Gamma,R)$ be the ring of Hahn series
+with well-ordered support.  For a unit
+monomial $M=c\,\mathfrak{q}^\gamma\in S$ with $c\in R^\times$
+and $\gamma\neq 0$:
+\[
+  (1-M)^{-1}=
+  \begin{cases}
+    \displaystyle\sum_{\ell\ge 0}M^\ell, & \gamma>0,\\[6pt]
+    \displaystyle-\sum_{\ell\ge 1}M^{-\ell}, & \gamma<0.
+  \end{cases}
+\]
+The coefficient of $M^\ell$ is therefore $1$ for $\ell\ge 0$ when
+$\gamma>0$, and $-1$ for $\ell\le -1$ when $\gamma<0$;
+zero otherwise.
+\end{lemma}
+
+\begin{proof}
+For $\gamma>0$, the support $\{0,\gamma,2\gamma,\ldots\}$ is
+well-ordered in~$\Gamma$, so the series lies in~$S$.
+For $\gamma<0$, factor $(1-M)^{-1}=-M^{-1}(1-M^{-1})^{-1}$;
+since $-\gamma>0$, the factor $(1-M^{-1})^{-1}$ has well-ordered
+support, and the product lies in~$S$.
+\end{proof}
+
+\begin{lemma}[Branch coefficient]\label{lem:branch}
+For a unit monomial $M$ with leading exponent $\gamma\neq 0$ in the
+linearly ordered group, the coefficient of $M^\ell$ in $(1-M)^{-1}$ is
+\[
+  [M^\ell](1-M)^{-1}=\frac{\sg(\ell)+\sg(\gamma)}{2},
+\]
+where we use the convention $\sg(0)=1$.
+\end{lemma}
+
+\begin{proof}
+By Lemma~\ref{lem:hahn}: if $\gamma>0$, the coefficient is $1$ for
+$\ell\ge 0$ and $0$ for $\ell<0$, which equals $(1+\sg(\ell))/2
+=(\sg(\ell)+\sg(\gamma))/2$.  If $\gamma<0$, the coefficient is
+$-1$ for $\ell\le -1$ and $0$ for $\ell\ge 0$, which equals
+$(-1+\sg(\ell))/2=(\sg(\ell)+\sg(\gamma))/2$.
+\end{proof}
+
+\begin{lemma}[Cleared Appell numerator]\label{lem:cleared}
+$\bar{J}_{0,N}\,m(a,q^N,-1)
+=\sum_{k\in\Z} q^{N\binom{k}{2}}/(1+q^{N(k-1)}a)$.
+\end{lemma}
+
+\begin{proof}
+With $z=-1$, the denominator of $m(a,q^N,-1)$ is
+$j(-1;\,q^N)=\bar{J}_{0,N}$, so the factor cancels.  In the
+numerator, $(-1)^k\cdot(-1)^k=1$, and $1-q^{N(k-1)}a\cdot(-1)
+=1+q^{N(k-1)}a$, giving the stated bilateral sum.
+\end{proof}
+
+%----------------------------------------------------------------------
+\section{Row Coefficients}\label{sec:rows}
+%----------------------------------------------------------------------
+
+\begin{lemma}[Local finiteness]\label{lem:finite}
+For fixed $(e,r,s)$, the equation $e=H(r,s)+N\binom{w+1}{2}$ has
+at most two solutions $w\in\Z$ (namely $w$ and $-w-1$ when
+$e-H(r,s)=N\binom{w+1}{2}$).  Hence every coefficient extraction
+in the proof is a finite sum.
+\end{lemma}
+
+\begin{proof}
+$\binom{w+1}{2}=(e-H(r,s))/N$ determines $w(w+1)/2$, which has
+at most two integer solutions.
+\end{proof}
+
+\begin{lemma}[Branch sign]\label{lem:branch-sign}
+Let $0\le t<n$, $k\in\Z$, and set
+\[
+  W_{k,t}=t+\tfrac{n-1}{2}-nk,\qquad
+  \gamma_{k,t}=N(k-1)+A_0-t\Delta.
+\]
+Then $\gamma_{k,t}\neq 0$ and $\sg(\gamma_{k,t})=-\sg(W_{k,t})$.
+\end{lemma}
+
+\begin{proof}
+Write $A=nk-t\in\Z$, so $W_{k,t}=(n-1)/2-A$ and
+$\gamma_{k,t}=\Delta(A-n/2)+np/2$.
+
+If $W_{k,t}\ge 0$: then $A\le(n-1)/2$, so
+$\gamma_{k,t}\le-p(n+p)/2<0$, so $\sg(\gamma_{k,t})=-1=-\sg(W_{k,t})$.
+
+If $W_{k,t}<0$: then $A>(n-1)/2$.  Since $A\in\Z$:
+for $n=2m$, $A\ge m$, so $\gamma_{k,t}\ge np/2>0$;
+for $n=2m+1$, $A\ge m+1$, so $\gamma_{k,t}\ge\Delta/2+np/2>0$.
+In both cases $\sg(\gamma_{k,t})=1=-\sg(W_{k,t})$.
+\end{proof}
+
+\begin{proposition}[Row exponent identity]\label{prop:exponent}
+For $s=n\ell+t$ with $0\le t<n$:
+\[
+  n\tbinom{t}{2}+n\tbinom{r+B\ell}{2}+Bt(r+B\ell)
+  +N\tbinom{k}{2}+\ell\bigl(N(k-1)+A_0-t\Delta\bigr)
+  =H(r,s)+N\tbinom{k+\ell}{2}.
+\]
+\end{proposition}
+
+\begin{proof}
+Both sides are polynomials in $(r,t,\ell,k,n,p)$ of degree~3.
+Substituting $s=n\ell+t$, $B=n+p$, $\Delta=B^2-n^2=p(2n+p)$,
+$N=n\Delta$, $A_0=np(2n+p+1)/2$, and expanding both sides, the
+difference vanishes identically.\footnote{A Sage script
+verifying this polynomial identity and the appendix exponent
+identity~(A.15) is included as \texttt{check\_exponents.sage}.}
+The same identity holds with $r$ and $s$ interchanged.
+\end{proof}
+
+\begin{proposition}[$s$-row coefficient]\label{prop:s-row}
+Let $V_w=s-nw-(n+1)/2$.  Then
+\[
+  [q^e\,x^r\,y^s]\;\bar{J}_{0,N}\sum_{t=0}^{n-1}G_t^{(s)}
+  =(-1)^{r+s}\sum_{w\in\Z}
+    \frac{\sg(s)-\sg(V_w)}{2}\,
+    \mathbf{1}_{e=H(r,s)+N\binom{w+1}{2}}.
+\]
+\end{proposition}
+
+\begin{proof}
+Write $s=n\ell+t$ with $0\le t<n$.  The Appell parameter is
+$a_t=-q^{A_0-t\Delta}(-y)^n/(-x)^B$.  By Lemma~\ref{lem:cleared},
+\begin{equation}\label{eq:cleared-s}
+  \bar{J}_{0,N}G_t^{(s)}
+  =(-y)^t q^{n\binom{t}{2}}
+   \sum_{u\in\Z}(-1)^u q^{n\binom{u}{2}+Btu}\,x^u
+   \sum_{k\in\Z}
+   \frac{q^{N\binom{k}{2}}}{1-M_{k,t}},
+\end{equation}
+where
+\[
+  M_{k,t}=q^{N(k-1)+A_0-t\Delta}\,\frac{(-y)^n}{(-x)^B}
+\]
+is the denominator monomial (note: $1+q^{N(k-1)}a_t=1-M_{k,t}$).
+
+\emph{Step~1: monomial forcing.}
+The monomial $x^r y^s$ from $x^u\cdot M_{k,t}^\ell$ forces
+$u-B\ell=r$ (so $u=r+B\ell$) and $n\ell+t=s$ (so $\ell=(s-t)/n$).
+Since $M_{k,t}^\ell=q^{\ell\gamma_{k,t}}(-y)^{n\ell}(-x)^{-B\ell}$,
+the total sign is $(-1)^t\cdot(-1)^u\cdot(-1)^{n\ell}\cdot(-1)^{-B\ell}
+=(-1)^{t+u+n\ell-B\ell}=(-1)^{t+(r+B\ell)+n\ell-B\ell}=(-1)^{r+t+n\ell}
+=(-1)^{r+s}$ (using $t+n\ell=s$).
+
+\emph{Step~2: exponent.}
+By Proposition~\ref{prop:exponent}, the total $q$-exponent is
+$H(r,s)+N\binom{k+\ell}{2}$.  Set $w=k+\ell-1$; then
+$\binom{k+\ell}{2}=\binom{w+1}{2}$.
+
+\emph{Step~3: branch coefficient.}
+The leading exponent of $M_{k,t}$ in the lexicographic Hahn order
+(with $q$ first) is $\gamma_{k,t}=N(k-1)+A_0-t\Delta$.  By
+Lemma~\ref{lem:branch}, the coefficient of $M_{k,t}^\ell$ in
+$(1-M_{k,t})^{-1}$ is $(\sg(\ell)+\sg(\gamma_{k,t}))/2$.
+
+After substitution $k=w-\ell+1$:
+\[
+  \gamma_{k,t}=N(w-\ell)+A_0-t\Delta.
+\]
+By Lemma~\ref{lem:branch-sign} (with $W_{k,t}=V_w$),
+$\sg(\gamma_{k,t})=-\sg(V_w)$.  Therefore the branch coefficient is
+$(\sg(\ell)-\sg(V_w))/2$.
+Since $s=n\ell+t$ with $0\le t<n$ and $\sg(0)=1$, one has
+$\sg(\ell)=\sg(s)$, giving the stated formula.
+\end{proof}
+
+\begin{proposition}[$r$-row coefficient]\label{prop:r-row}
+Let $U_w=r+nw+(n-1)/2$.  Then
+\[
+  [q^e\,x^r\,y^s]\;\bar{J}_{0,N}\sum_{t=0}^{n-1}G_t^{(r)}
+  =(-1)^{r+s}\sum_{w\in\Z}
+    \frac{\sg(r)-\sg(U_w)}{2}\,
+    \mathbf{1}_{e=H(r,s)+N\binom{w+1}{2}}.
+\]
+\end{proposition}
+
+\begin{proof}
+Write $r=n\ell+t$ with $0\le t<n$.  The Appell parameter is
+$a_t=-q^{A_0-t\Delta}(-x)^n/(-y)^B$.  By Lemma~\ref{lem:cleared},
+\[
+  \bar{J}_{0,N}G_t^{(r)}
+  =(-x)^t q^{n\binom{t}{2}}
+   \sum_{v\in\Z}(-1)^v q^{n\binom{v}{2}+Btv}\,y^v
+   \sum_{k\in\Z}
+   \frac{q^{N\binom{k}{2}}}{1-M'_{k,t}},
+\]
+where $M'_{k,t}=q^{N(k-1)+A_0-t\Delta}(-x)^n/(-y)^B$.
+
+\emph{Monomial forcing:} $y^v\cdot(M'_{k,t})^\ell$ gives $v-B\ell=s$
+and $n\ell+t=r$.  Total sign:
+$(-1)^{t+v+n\ell-B\ell}=(-1)^{s+t+n\ell}=(-1)^{r+s}$.
+
+\emph{Exponent:} by the symmetric row-exponent identity
+(Proposition~\ref{prop:exponent} with $r\leftrightarrow s$),
+the $q$-exponent is $H(r,s)+N\binom{k+\ell}{2}$.  Set $w=-k-\ell$
+(the opposite sign convention from the $s$-row, chosen so that
+$U_w$ matches $W_{k,t}$);
+then $\binom{k+\ell}{2}=\binom{-w}{2}=\binom{w+1}{2}$ and
+$U_w=r+nw+(n-1)/2=t+(n-1)/2-nk$.
+
+\emph{Branch sign:} by Lemma~\ref{lem:branch-sign} with $W_{k,t}=U_w$,
+$\sg(\gamma'_{k,t})=-\sg(U_w)$.  The branch coefficient
+is $(\sg(\ell)-\sg(U_w))/2=(\sg(r)-\sg(U_w))/2$.
+\end{proof}
+
+\begin{corollary}[Cleared Appell coefficient]\label{cor:g-coeff}
+\[
+  [q^e\,x^r\,y^s]\;\bar{J}_{0,N}\,g_{n,n+p,n}
+  =(-1)^{r+s}\sum_{w\in\Z}
+    \bigl(\sgtwo(r,s)-\sgtwo(U_w,V_w)\bigr)\,
+    \mathbf{1}_{e=H(r,s)+N\binom{w+1}{2}}.
+\]
+\end{corollary}
+
+\begin{proof}
+Add Propositions~\ref{prop:s-row} and~\ref{prop:r-row} and use
+$\frac{\sg(r)-\sg(U_w)}{2}+\frac{\sg(s)-\sg(V_w)}{2}
+=\sgtwo(r,s)-\sgtwo(U_w,V_w)$.
+\end{proof}
+
+%----------------------------------------------------------------------
+\section{Proof of the Main Identity}\label{sec:proof}
+%----------------------------------------------------------------------
+
+\begin{proof}[Proof of Theorem~\ref{thm:main}]
+Fix $e,r,s\in\Z$.  Since
+$\bar{J}_{0,N}=\sum_{w\in\Z}q^{N\binom{w+1}{2}}$,
+the Hecke coefficient is
+\[
+  [q^e\,x^r\,y^s]\;\bar{J}_{0,N}\,f_{n,n+p,n}
+  =(-1)^{r+s}\sum_{w\in\Z}\sgtwo(r,s)\,
+    \mathbf{1}_{e=H(r,s)+N\binom{w+1}{2}}.
+\]
+By Corollary~\ref{cor:g-coeff}:
+\[
+  [q^e\,x^r\,y^s]\;\bar{J}_{0,N}\,g_{n,n+p,n}
+  =(-1)^{r+s}\sum_{w\in\Z}
+    \bigl(\sgtwo(r,s)-\sgtwo(U_w,V_w)\bigr)\,
+    \mathbf{1}_{e=H(r,s)+N\binom{w+1}{2}}.
+\]
+Subtracting:
+\[
+  [q^e\,x^r\,y^s]\bigl(\bar{J}_{0,N}\,f-\bar{J}_{0,N}\,g\bigr)
+  =(-1)^{r+s}\sum_{w\in\Z}\sgtwo(U_w,V_w)\,
+    \mathbf{1}_{e=H(r,s)+N\binom{w+1}{2}},
+\]
+which equals $[q^e\,x^r\,y^s]\,\bar\Theta_{n,p}$ by definition.
+\end{proof}
+
+%----------------------------------------------------------------------
+\section{Examples}\label{sec:examples}
+%----------------------------------------------------------------------
+
+\subsection{\texorpdfstring{$f_{2,3,2}$ ($n=2$, $p=1$, $\Delta=5$)}{f232 (n=2, p=1)}}
+Here $N=10$, $B=3$, and the Appell sum has $2n=4$ rows.
+The main identity gives
+$\bar{J}_{0,10}\,f_{2,3,2}=\bar{J}_{0,10}\,g_{2,3,2}+\bar\Theta_{2,1}$.
+In the Lean~4 formalization, the right-hand side is packaged as
+$\text{Ghat}(1)=g+\theta/\bar{J}$, and the identity
+$f_{2,3,2}=\text{Ghat}(1)$ is proved with zero \texttt{sorry}.
+
+\subsection{\texorpdfstring{$f_{1,3,1}$ ($n=1$, $p=2$, $\Delta=8$)}{f131 (n=1, p=2)}}
+Here $N=8$ and the Appell sum has $2$ rows.  The cleared theta
+correction $\bar\Theta_{1,2}$ is nonzero.  For instance, at
+$(r,s)=(1,1)$: $U_0=1$, $V_0=0$, $U_{-1}=0$, $V_{-1}=1$, giving
+$[q^3\,xy]\,\bar{J}_{0,8}\,f_{1,3,1}=2$,
+$[q^3\,xy]\,\bar{J}_{0,8}\,g_{1,3,1}=0$, and
+$[q^3\,xy]\,\bar\Theta_{1,2}=\sgtwo(1,0)+\sgtwo(0,1)=2$.
+
+\subsection{\texorpdfstring{$f_{1,4,1}$ ($n=1$, $p=3$, $\Delta=15$)}{f141 (n=1, p=3)}}
+Here $N=15$ and the Appell sum has $2$ rows.
+The direct coefficient proof applies without
+modification.  The correction $\bar\Theta_{1,3}$ is nonzero:
+at $(r,s)=(1,1)$, $[q^4\,xy]\,\bar\Theta_{1,3}=2$, matching the
+defect $[q^4\,xy](\bar{J}\cdot f-\bar{J}\cdot g)=2-0=2$.
+
+\subsection{\texorpdfstring{$f_{2,4,2}$ ($n=2$, $p=2$, $\gcd=2$)}{f242 (n=2, p=2, non-coprime)}}
+Here $\gcd(n,p)=2$, $N=24$, $B=4$, $\Delta=12$, and the
+Appell sum has $2n=4$ rows.  By the $q$-scaling identity
+(Section~\ref{sec:discussion}),
+$f_{2,4,2}(x,y,q)=f_{1,2,1}(x,y,q^2)$, so the Hecke sum
+admits both the $(2,2)$-decomposition of
+Theorem~\ref{thm:main} and the scaled primitive
+$(1,1)$-decomposition.  The coefficient proof applies to
+the $(2,2)$-decomposition directly: no step uses
+$\gcd(n,p)=1$.
+
+%----------------------------------------------------------------------
+\section{Formal Verification}\label{sec:lean}
+%----------------------------------------------------------------------
+
+Table~\ref{tab:lean} summarizes the Lean~4 formalization status.
+
+\begin{table}[ht]
+\centering
+\begin{tabular}{lll}
+\hline
+\textbf{Claim} & \textbf{Status} & \textbf{File / theorem} \\
+\hline
+$f_{2,3,2}$ (spiral param.) & fully verified & \texttt{Chapter10\_M3\_AppellCoeffNF} \\
+Row-exponent identity & verified $\forall n,p$ & \texttt{Chapter10\_RootPairGeneral} \\
+Branch-sign lemma & verified $\forall n,p$ & \texttt{Chapter10\_RootPairGeneral} \\
+Parity criterion & verified $\forall n,p$ & \texttt{Chapter10\_RootPairGeneral} \\
+Props.~\ref{prop:s-row},\ref{prop:r-row} (general) & fully verified & \texttt{Chapter10\_GeneralHahnCoeff} \\
+Main identity, all $n,p\ge1$ & fully verified & \texttt{general\_boundary\_cleared\_hm\_coefficient} \\
+Kronecker coefficient proof & fully verified & \texttt{Chapter10\_KroneckerCoeff} \\
+HM residue comparison & fully verified & \texttt{Chapter10\_HMComparison} \\
+\hline
+\end{tabular}
+\caption{Lean~4 formalization coverage.  All verified items have
+zero \texttt{sorry} and no axioms beyond \texttt{propext},
+\texttt{Classical.choice}, \texttt{Quot.sound}.}
+\label{tab:lean}
+\end{table}
+
+The $f_{2,3,2}$ verification (commit \texttt{5ead660})
+proves the identity
+\texttt{Fhm\_eq\_Ghat\_via\_uvOmega} via a wall-coordinate
+specialization: parity split of the 4~Appell rows, finsum
+reindex via coordinate equivalences, wall-defect decomposition,
+and root-pair cancellation.  The Lean object \texttt{Ghat}
+is defined as a four-row Appell sum specialized to HM's
+monomial-spiral parameter (cf.~\cite{jHiMo14}, Theorem~0.6).
+This older regression uses a different specialization interface and is
+logically independent of the general coefficient theorem formalized here.
+
+The general algebraic core is formalized in
+\nolinkurl{Chapter10_RootPairGeneral.lean};
+\nolinkurl{Chapter10_GeneralHahnCoeff.lean} adds the explicit finite residue
+rows, their monomial-forcing collapse, local finiteness, both row formulas,
+and the main coefficient assembly.  The appendix is formalized independently:
+\nolinkurl{Chapter10_KroneckerCoeff.lean} proves the PF quasi-period by an
+inverse-coefficient telescope, and \nolinkurl{Chapter10_HMComparison.lean}
+retains both residue variables and all three bilateral indices in a constrained
+source type, proves its equivalence with the single shell index $w$, and checks
+the branch-sign and exponent formulas (A.10)--(A.17).  The final module is
+\nolinkurl{Chapter10_HahnHeckeAppell}; its main theorem is
+\nolinkurl{general_boundary_cleared_hm_coefficient}.
+
+The self-contained fixed registry source, its exact proof closure, and the
+paper snapshot are archived together at
+\url{https://github.com/xiangyazi24/palomar-hahn-hecke-appell}.
+The relevant Lean files are in the \texttt{Pending/} directory and the final
+audit target is
+\nolinkurl{QseriesFormalization.Pending.Chapter10_HahnHeckeAppellAudit}.
+A Sage script verifying both the row-exponent identity
+(Proposition~\ref{prop:exponent}) and the appendix exponent
+identity~(A.15) is included as \texttt{check\_exponents.sage}.
+
+%----------------------------------------------------------------------
+\section{Discussion}\label{sec:discussion}
+%----------------------------------------------------------------------
+
+\subsection*{Comparison with existing proofs}
+
+The Hickerson--Mortenson proof~\cite{jHiMo14} uses analytic
+uniqueness; Mortenson~\cite{jMo12} uses ${}_1\psi_1$.  Our proof
+replaces both with Hahn-series coefficient algebra.  The $\sgtwo$
+structure arises from the Hahn geometric inverse expansion direction,
+providing a formal-algebraic interpretation of the Appell--Lerch
+sign-wall coefficients.
+
+The row-exponent identity (Proposition~\ref{prop:exponent}) is the
+algebraic heart: it collapses the multi-index Appell row exponent
+into the Hecke exponent $H(r,s)$ plus a theta shell $N\binom{w+1}{2}$.
+This identity is verifiable by \texttt{ring} and is the key step
+that makes the coefficient comparison self-contained.
+
+We note the relationship with Bailey-pair approaches to Hecke-type
+double sums~\cite{jAn01,jLO13}.  Those methods are also
+formal-series arguments and produce identities for one-variable
+specializations; however, they do not establish the two-variable
+$(x,y)$-generic Appell--Lerch \emph{decomposition}, where the
+bilateral Appell parameter is precisely where analytic or Hahn-algebraic
+machinery enters.
+
+\subsection*{Non-coprime cases}
+
+For $\gcd(n,p)=d>1$, one has
+$f_{dn_0,d(n_0+p_0),dn_0}(x,y;q)=f_{n_0,n_0+p_0,n_0}(x,y;q^d)$,
+so the Hecke sum admits both the direct $(n,p)$-decomposition
+(Theorem~\ref{thm:main}) and the scaled primitive
+$(n_0,p_0)$-decomposition.  The two decompositions have different
+numbers of Appell rows and different base parameters; their
+coexistence is a consistency check, not a derivation of one
+from the other.
+
+\subsection*{Connection to indefinite theta functions and wall-crossing
+  (formal analogy, not used in the proof)}
+
+The $\sgtwo$ kernel appearing in $\bar\Theta_{n,p}$ is of the
+same type as the sign-wall functions arising in Zwegers'
+indefinite theta series~\cite{oZw02} and in the wall-crossing
+analysis of Dabholkar--Murthy--Zagier~\cite{jDMZ14}.
+The connection is structural: the Hecke exponent $H(r,s)$
+is an indefinite quadratic form of type~$(1,1)$---the same
+structure that Hecke~\cite{oHe25} studied in his original
+construction of modular forms from indefinite quadratic
+forms---and the chosen Hahn lexicographic order is the
+formal expansion chamber analogous to the analytic chamber
+in which the corresponding monomials satisfy $|q|<1$.
+
+From a polyhedral viewpoint, the signed Hahn geometric inverse
+(Lemma~\ref{lem:hahn}) is a one-dimen\-sional instance of the
+polarized-cone expansion of
+Varchenko~\cite{jVa87} and Brion~\cite{jBr88}: expanding
+$1/(1-M)$ in one Hahn chamber selects one ray of a
+one-dimensional cone, and the branch sign records the
+orientation.  The theta correction $\bar\Theta_{n,p}$ is then
+the boundary term arising from the polarization.  The use of
+ordered formal series rings to select expansion branches is
+also developed by Xin~\cite{jXi05} (Malcev--Neumann series
+and formal residues) and Aparicio
+Monforte--Kauers~\cite{jAMK13} (formal Laurent series in
+several variables).
+
+What distinguishes the formal
+setting is that the $\sgtwo$ kernel remains exact---no Vign\'eras
+error function~\cite{oVi77} or modular completion is needed,
+because the Hahn ring has no $\bar\tau$ variable to smooth.
+This connection is included as context; the paper does not prove
+a modular completion theorem.
+
+\subsection*{Coefficient data for quantum-modular settings
+  (possible application, not proved here)}
+
+The paper formulas are integer-valued coefficient identities.  The current
+Lean wrapper checks them over $\Q$ and does not separately formalize
+integrality or arbitrary-ring base change.  The resulting coefficient data
+is available as input to quantum-modular and radial-limit
+analysis~\cite{jZag10,jFOR13}, where the analytic and
+${}_1\psi_1$ proofs do not directly supply such data.
+
+\subsection*{Extensions}
+
+The approach may extend to other families of indefinite theta
+identities.  For $f_{a,b,c}$ with $a\neq c$ (HM Theorem~0.4),
+the row-exponent identity generalizes, but the branch-sign lemma
+requires a case analysis whose boundary cases encode the
+additional correction structure.  The key requirement is a
+row-exponent collapse analogous to Proposition~\ref{prop:exponent};
+when such a collapse exists, the branch-sign mechanism produces the
+correction term automatically.
+
+\bibliographystyle{plain}
+\bibliography{master}
+
+\input{appendix-hm}
+
+\end{document}

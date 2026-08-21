@@ -1,3 +1,4 @@
 import Solution
 
-#print axioms PalomarHahnHeckeAppell.general_boundary_cleared_coefficient
+#print axioms PalomarHahnHeckeAppell.kronecker_partial_fraction_cleared_coefficient
+#print axioms PalomarHahnHeckeAppell.general_boundary_cleared_hm_coefficient

@@ -1,0 +1,336 @@
+%----------------------------------------------------------------------
+\appendix
+\section{Coefficient comparison with the Hickerson--Mortenson theta term}
+\label{app:HM-coeff-comparison}
+%----------------------------------------------------------------------
+
+We keep the conventions of the paper:
+\[
+  C_2(z)=\binom z2=\frac{z(z-1)}2,\qquad
+  B=n+p,\qquad
+  \Delta=p(2n+p),\qquad
+  N=n\Delta,
+\]
+\[
+  A_0=\frac{np(2n+p+1)}2,\qquad
+  H(R,S)=nC_2(R)+BRS+nC_2(S),\qquad
+  \sgtwo(u,v)=\frac{\sg(u)+\sg(v)}2,
+\]
+and
+\[
+  j(z;q)=\sum_{m\in\mathbb Z}(-1)^m q^{C_2(m)}z^m,\qquad
+  \sg(0)=1.
+\]
+Let
+\[
+  \alpha=\frac{n-1}{2},\qquad \beta=\frac{n+1}{2},\qquad
+  \varepsilon=\{\alpha\}\in\{0,1/2\}.
+\]
+For \(r^*,s^*\in\{0,\ldots,p-1\}\), put
+\[
+  \widetilde r=r^*+\varepsilon,\qquad
+  \widetilde s=s^*+\varepsilon,\qquad
+  \rho=\widetilde r-\alpha,\qquad
+  \sigma=\widetilde s+\beta.
+\]
+Then \(\rho,\sigma\in\mathbb Z\), and
+\(\widetilde r,\widetilde s\in \varepsilon+\{0,\ldots,p-1\}\subset[0,p)\).
+Also
+\[
+  \widetilde s-\widetilde r=\sigma-\rho-n.
+\]
+The Hickerson--Mortenson theta correction, specialized to
+\((z_0,z_1)=(-1,-1)\), can be rewritten as
+\[
+\begin{aligned}
+\theta^{\rm HM}_{n,p}
+=&\sum_{r^*=0}^{p-1}\sum_{s^*=0}^{p-1}
+ q^{H(\rho,\sigma)}(-x)^\rho(-y)^\sigma
+ j\!\left(-q^{np(\sigma-\rho-n)}\frac{x^n}{y^n};q^{np^2}\right) \\
+&\qquad\qquad\times
+ \frac{J_Q^3\,j(d_1d_2;Q)}{j(d_1;Q)j(d_2;Q)},
+\end{aligned}
+\tag{A.1}
+\]
+where
+\[
+  Q=q^{p\Delta}=q^{p^2(2n+p)},
+\]
+\[
+  d_1=q^{\Delta\rho+A_0-np}\frac{(-y)^B}{(-x)^n},\qquad
+  d_2=q^{\Delta\sigma-A_0}\frac{(-x)^B}{(-y)^n}.
+\]
+Indeed,
+\[
+  d_1d_2=q^{\Delta(\rho+\sigma)-np}(-x)^p(-y)^p,
+\]
+which is the second numerator theta argument in HM's formula, since
+\[
+  \Delta(\widetilde r+\widetilde s)+pB
+  =\Delta(\rho+\sigma-1)+pB
+  =\Delta(\rho+\sigma)-np.
+\]
+
+\begin{lemma}[Kronecker partial fraction]\label{lem:kronecker}
+With $j(z;Q)=\sum_m(-1)^mQ^{\binom{m}{2}}z^m$,
+\[
+  \frac{J_Q^3\,j(ab;Q)}{j(a;Q)\,j(b;Q)}
+  =\sum_{\eta\in\mathbb Z}\frac{b^\eta}{1-aQ^\eta}.
+\tag{A.2}
+\]
+\end{lemma}
+
+\begin{proof}
+We give the coefficientwise proof used in the Lean development.  Put
+\[
+  \operatorname{PF}(a)=
+  \sum_{k\in\mathbb Z}
+    \frac{(-1)^kQ^{\binom{k+1}{2}}}{1-aQ^k},
+\]
+with every denominator expanded in its signed $Q$-first Hahn branch.
+The coefficientwise partial-fraction theorem
+\[
+  j(a;Q)\operatorname{PF}(a)=J_Q^3
+\]
+follows by a geometric telescope: all nonconstant $a$-coefficients cancel,
+while the constant coefficient is Jacobi's cube identity.
+
+Let $K(a,b)=\sum_{\eta\in\mathbb Z}b^\eta/(1-aQ^\eta)$.
+The coefficient of $b^B$ in $j(b;Q)K(a,b)$ is
+\[
+  \sum_{s\in\mathbb Z}
+    \frac{(-1)^sQ^{\binom{s}{2}}}{1-aQ^{B-s}}
+  =\operatorname{PF}(aQ^B),
+\]
+where the second equality uses $k=-s$ and
+$\binom{s}{2}=\binom{k+1}{2}$.  The inverse-coefficient telescope also gives
+\[
+  \operatorname{PF}(aQ^B)
+  =(-1)^BQ^{\binom{B}{2}}a^B\operatorname{PF}(a)
+  \qquad(B\in\mathbb Z).
+\]
+In the one-step relation, the only boundary term is a coefficient of
+$j(1;Q)$, whose two roots $k$ and $-k-1$ cancel.  The last display is exactly
+the coefficient of $b^B$ in $j(ab;Q)\operatorname{PF}(a)$.  Hence
+\[
+  j(b;Q)K(a,b)=j(ab;Q)\operatorname{PF}(a)
+\]
+coefficientwise.  Multiplication by $j(a;Q)$ and the partial-fraction theorem
+above gives
+\[
+  j(a;Q)j(b;Q)K(a,b)=J_Q^3j(ab;Q);
+\]
+cancellation in the
+corresponding Hahn fraction field proves (A.2).  This is the classical
+Kronecker identity (cf.~Weil~\cite{oWe76}, Chapter~IV,
+and~\cite{jHiMo14}, Proposition~5.7 and Lemma~5.10), but no residue or
+Liouville argument is needed here.
+\end{proof}
+Applying Lemma~\ref{lem:kronecker} with $a=d_1$, $b=d_2$ gives
+\[
+  \frac{J_Q^3j(d_1d_2;Q)}{j(d_1;Q)j(d_2;Q)}
+  =\sum_{\eta\in\mathbb Z}\frac{d_2^\eta}{1-Q^\eta d_1}.
+\tag{A.3}
+\]
+Next expand the first numerator theta factor by the Jacobi triple product:
+\[
+\begin{aligned}
+ j\!\left(-q^{np(\sigma-\rho-n)}\frac{x^n}{y^n};q^{np^2}\right)
+ &=\sum_{\iota\in\mathbb Z}
+ (-1)^\iota q^{np^2 C_2(\iota)}
+ \left(-q^{np(\sigma-\rho-n)}\frac{x^n}{y^n}\right)^\iota \\
+ &=\sum_{\iota\in\mathbb Z}
+ q^{np^2 C_2(\iota)+np(\sigma-\rho-n)\iota}
+ (-x)^{n\iota}(-y)^{-n\iota}.
+\end{aligned}
+\tag{A.4}
+\]
+Here the signs cancel because \((-1)^\iota(-1)^\iota=1\).
+
+For the remaining denominator, set
+\[
+  M_{\rho,\eta}=Q^\eta d_1
+  =q^{p\Delta\eta+\Delta\rho+A_0-np}\frac{(-y)^B}{(-x)^n}.
+\]
+Its leading \(q\)-exponent is
+\[
+  \Gamma_{\rho,\eta}=p\Delta\eta+\Delta\rho+A_0-np.
+\]
+\emph{Formal--analytic bridge.}
+On the unit torus $|x|=|y|=1$ with $|q|<1$,
+$|M_{\rho,\eta}|=|q|^{\Gamma_{\rho,\eta}}$, so
+$|M_{\rho,\eta}|<1$ iff $\Gamma_{\rho,\eta}>0$.
+Hence the Hahn branch of $(1-M_{\rho,\eta})^{-1}$
+coincides with the convergent geometric series.  Thus the coefficientwise
+proof of Lemma~\ref{lem:kronecker} specializes to the analytic quotient on
+this torus, with the same Hahn branch convention.
+The signed Hahn geometric expansion gives
+\[
+  (1-M_{\rho,\eta})^{-1}
+  =\sum_{\ell\in\mathbb Z} c_{\rho,\eta}(\ell)M_{\rho,\eta}^{\ell},\qquad
+  c_{\rho,\eta}(\ell)=\frac{\sg(\ell)+\sg(\Gamma_{\rho,\eta})}{2}.
+\tag{A.5}
+\]
+
+Combining (A.1)--(A.5), a term indexed by
+\((\rho,\sigma,\iota,\eta,\ell)\) has monomial part
+\[
+  (-x)^{\rho+n\iota+B\eta-n\ell}
+  (-y)^{\sigma-n\iota-n\eta+B\ell}.
+\]
+Thus the coefficient of \((-x)^R(-y)^S\) is constrained by
+\[
+  R=\rho+n\iota+B\eta-n\ell,\qquad
+  S=\sigma-n\iota-n\eta+B\ell.
+\tag{A.6}
+\]
+Define
+\[
+  w=\ell-\iota-\eta.
+\tag{A.7}
+\]
+Then (A.6) implies
+\[
+  U_w:=R+nw+\alpha=\rho+p\eta+\alpha=\widetilde r+p\eta,
+\tag{A.8}
+\]
+\[
+  V_w:=S-nw-\beta=\sigma-\beta+p\ell=\widetilde s+p\ell.
+\tag{A.9}
+\]
+Conversely, for fixed \(R,S,w\), equations (A.8)--(A.9) determine the
+contributing residue pair and summation indices uniquely.  Indeed, since
+\(\widetilde r\in\varepsilon+\{0,\ldots,p-1\}\), there is a unique
+\(\widetilde r\) in that residue interval and a unique \(\eta\in\mathbb Z\)
+such that
+\[
+  R+nw+\alpha=\widetilde r+p\eta.
+\]
+Similarly, there is a unique \(\widetilde s\in\varepsilon+\{0,\ldots,p-1\}\)
+and a unique \(\ell\in\mathbb Z\) such that
+\[
+  S-nw-\beta=\widetilde s+p\ell.
+\]
+Then \(\rho=\widetilde r-\alpha\), \(\sigma=\widetilde s+\beta\), and
+(A.7) determines the unique remaining index
+\[
+  \iota=\ell-\eta-w.
+\]
+Thus coefficient extraction over the HM residue variables and the bilateral
+indices is equivalent to summing over \(w\in\mathbb Z\).
+
+We now identify the branch coefficient.  Since
+\(\widetilde s\in[0,p)\), equation (A.9) gives
+\[
+  \sg(\ell)=\sg(\widetilde s+p\ell)=\sg(V_w).
+\tag{A.10}
+\]
+Indeed this is immediate for \(\ell\ge0\), while for \(\ell\le -1\) one has
+\(\widetilde s+p\ell<0\).  Likewise, using (A.8),
+\[
+\begin{aligned}
+  \Gamma_{\rho,\eta}
+  &=p\Delta\eta+\Delta\rho+A_0-np \\
+  &=\Delta(\rho+p\eta)+A_0-np \\
+  &=\Delta(U_w-\alpha)+A_0-np \\
+  &=\Delta U_w+\frac{pB}{2}.
+\end{aligned}
+\tag{A.11}
+\]
+If \(U_w\ge0\), then \(\Gamma_{\rho,\eta}>0\).  If \(U_w<0\), then
+\(U_w=\widetilde r+p\eta\) with \(\eta\le -1\), hence
+\(U_w\le \widetilde r-p\le -1/2\), and therefore
+\[
+  \Gamma_{\rho,\eta}\le -\frac{\Delta}{2}+\frac{pB}{2}
+  =-\frac{np}{2}<0.
+\]
+Thus
+\[
+  \sg(\Gamma_{\rho,\eta})=\sg(U_w).
+\tag{A.12}
+\]
+Combining (A.5), (A.10), and (A.12), the branch coefficient becomes
+\[
+  c_{\rho,\eta}(\ell)
+  =\frac{\sg(V_w)+\sg(U_w)}2
+  =\sgtwo(U_w,V_w).
+\tag{A.13}
+\]
+
+It remains to compute the \(q\)-exponent.  The total exponent of the term
+indexed by \((\rho,\sigma,\iota,\eta,\ell)\) is
+\[
+\begin{aligned}
+\mathcal E
+=&H(\rho,\sigma)
+ +np^2C_2(\iota)+np(\sigma-\rho-n)\iota \\
+&+(\Delta\sigma-A_0)\eta
+ +(p\Delta\eta+\Delta\rho+A_0-np)\ell.
+\end{aligned}
+\tag{A.14}
+\]
+Using (A.6) and (A.7), a direct expansion gives
+\[
+  \mathcal E=H(R,S)+N C_2(w+1).
+\tag{A.15}
+\]
+The following Sage snippet is included as an audit aid; the
+identity is an elementary polynomial expansion:
+\begin{verbatim}
+var('rho sigma iota eta ell n p')
+C2 = lambda z: z*(z-1)/2
+B = n + p
+Delta = p*(2*n + p)
+N = n*Delta
+A0 = n*p*(2*n + p + 1)/2
+R = rho + n*iota + B*eta - n*ell
+S = sigma - n*iota - n*eta + B*ell
+w = ell - iota - eta
+H = lambda X,Y: n*C2(X) + B*X*Y + n*C2(Y)
+E = H(rho,sigma) + n*p^2*C2(iota) + n*p*(sigma-rho-n)*iota \
+    + (Delta*sigma - A0)*eta \
+    + (p*Delta*eta + Delta*rho + A0 - n*p)*ell
+expand(E - H(R,S) - N*C2(w+1))
+# output: 0
+\end{verbatim}
+
+Therefore, for fixed \(e,R,S\), equations (A.13)--(A.15) give
+\[
+\begin{aligned}
+\relax[q^e(-x)^R(-y)^S]\,\theta^{\rm HM}_{n,p}
+=\sum_{w\in\mathbb Z}
+ \sgtwo\!\left(R+nw+\frac{n-1}{2},
+               S-nw-\frac{n+1}{2}\right)
+ \mathbf 1_{\,e=H(R,S)+N C_2(w+1)}.
+\end{aligned}
+\tag{A.16}
+\]
+Equivalently, since \((-x)^R(-y)^S=(-1)^{R+S}x^Ry^S\),
+\[
+\begin{aligned}
+\relax[q^e x^R y^S]\,\theta^{\rm HM}_{n,p}
+=&(-1)^{R+S}
+\sum_{w\in\mathbb Z}
+ \sgtwo\!\left(R+nw+\frac{n-1}{2},
+               S-nw-\frac{n+1}{2}\right)  \\
+&\qquad\qquad\times
+ \mathbf 1_{\,e=H(R,S)+N C_2(w+1)}.
+\end{aligned}
+\tag{A.17}
+\]
+The sum is locally finite: for fixed \(e,R,S\), the equation
+\(e=H(R,S)+N C_2(w+1)\) has at most two integer solutions \(w\).
+
+But the coefficient of \(q^e x^R y^S\) in
+\[
+\bar\Theta_{n,p}
+=\sum_{R,S,w\in\mathbb Z}(-x)^R(-y)^S
+ \sgtwo\!\left(R+nw+\frac{n-1}{2},
+               S-nw-\frac{n+1}{2}\right)
+ q^{H(R,S)+N C_2(w+1)}
+\]
+is exactly the right-hand side of (A.17).  Hence
+\[
+  \theta^{\rm HM}_{n,p}(x,y,q)=\bar\Theta_{n,p}(x,y,q)
+\]
+coefficientwise.
