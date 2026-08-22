@@ -1,6 +1,6 @@
 name = "palomar_hahn_hecke_appell"
 version = "0.1.0"
-defaultTargets = ["PalomarHahnHeckeAppell", "QseriesFormalization", "Challenge", "Solution"]
+defaultTargets = ["PalomarHahnHeckeAppell", "Challenge", "Solution"]
 
 [[require]]
 name = "mathlib"
